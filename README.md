@@ -102,11 +102,11 @@ require("takeboat").setup({
   transparent = false,      -- true：Normal/行号列透明，浮窗仍留底色
   italic_comments = true,   -- 注释斜体
   bold_keywords = false,    -- 关键字加粗
-  dim_inactive = true,      -- 非当前窗口降对比度（NormalNC 用浮层底）
+  dim_inactive = false,     -- 非当前窗口正文降到 muted（底色始终不变，见“八、注意”）
   on_highlights = function(hl, c)
     -- hl 是即将写入的高亮表，c 是解析后的调色板（含派生色 faint / tint_* / diff_*）
     hl.Comment = { fg = c.muted, italic = true }
-    hl.NormalNC = { fg = c.fg, bg = c.bg } -- 关掉「切窗口时闪一下」
+    hl.CursorLineNr = { fg = c.red, bold = true }
   end,
 })
 ```
@@ -196,5 +196,9 @@ snacks（LazyVim 默认的 explorer 与 picker）会把 hidden / ignored / untra
 ## 八、注意
 
 - 需要 `termguicolors`（插件里已自动打开，终端本身要支持 truecolor）。
+- **非当前窗口（`NormalNC`）不换底色**：底色永远和 `Normal` 一致，`dim_inactive = true` 时
+  只把正文降到 `muted`。因为深色档里浮层色 `bg_alt` 比 `Normal` 更亮，把它当作 `NormalNC`
+  的底，焦点一移开整块编辑区就会「亮一下」，看着像闪屏——这个坑已经内置修掉了，
+  不用再在 `on_highlights` 里覆盖。
 - 纸色主题会把 `background` 切成 `light`，如果你的状态栏/终端背景是深色，第一次切可能有点晃眼——这是预期内的。
 - 没做 `lightline`/`airline` 主题；它们不吃 `lualine` 那套文件。

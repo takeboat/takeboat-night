@@ -16,8 +16,10 @@ M.defaults = {
   italic_comments = true,
   -- 关键字加粗（默认关，宋体式克制）
   bold_keywords = false,
-  -- 非当前窗口降低对比度
-  dim_inactive = true,
+  -- 非当前窗口降低对比度：只压前景（fg → muted），底色始终与 Normal 一致。
+  -- 不能把底色换成浮层色 bg_alt —— 深色档里 bg_alt 比 Normal 更亮，
+  -- 焦点一移开整块编辑区会「亮一下」，看起来像闪屏。
+  dim_inactive = false,
   -- 覆盖钩子：function(hl, colors) ... end
   on_highlights = nil,
 }
@@ -132,13 +134,15 @@ local function make_groups(c, o)
   local kw_bold = o.bold_keywords and true or nil
   local comment_italic = o.italic_comments and true or nil
   local normal_bg = o.transparent and "NONE" or c.bg
-  local normal_nc_bg = o.transparent and "NONE" or c.bg_alt
+  -- 非当前窗口：底色永远跟 Normal 相同（原因见 defaults 里 dim_inactive 的注释），
+  -- 想区分只降前景对比度，绝不换底色。
+  local normal_nc_fg = o.dim_inactive and c.muted or c.fg
 
   -------------------------------------------------------------------------
   -- 基础界面
   -------------------------------------------------------------------------
   g("Normal", { fg = c.fg, bg = normal_bg })
-  g("NormalNC", { fg = c.fg, bg = normal_nc_bg })
+  g("NormalNC", { fg = normal_nc_fg, bg = normal_bg })
   g("NormalFloat", { fg = c.fg, bg = c.bg_alt })
   g("FloatBorder", { fg = c.line, bg = c.bg_alt })
   g("FloatTitle", { fg = c.red, bg = c.bg_alt, bold = true })

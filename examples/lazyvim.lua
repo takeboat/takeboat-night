@@ -9,10 +9,6 @@ return {
         opts = {
             italic_comments = true,
             transparent = false,
-            on_highlights = function(hl, c)
-                -- 切窗口时编辑区不再「闪一下」
-                hl.NormalNC = { fg = c.fg, bg = c.bg }
-            end,
         },
         config = function(_, opts)
             require("takeboat").setup(opts)
